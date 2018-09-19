@@ -37,6 +37,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -46,8 +48,10 @@ public class Bank extends Application {
 
     Connection connection;
     Statement st;
-     ListView<Item> profileOfUsers;
-                    InputStream ref2 = null;
+    InputStream ref2 = null;
+    PasswordField password;
+    TextField login;
+    ResultSet rs;
 
     public Statement connectToDB() {
         try {
@@ -58,7 +62,6 @@ public class Bank extends Application {
         try {
             connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/bank", "postgres", "1425");
             st = connection.createStatement();
-
         } catch (SQLException ex) {
         }
         return st;
@@ -67,14 +70,15 @@ public class Bank extends Application {
     @Override
     public void start(Stage loginStage) throws SQLException {
         Group loginroot = new Group();
-        TextField login = new TextField();
+        
+        login = new TextField();
         login.setPromptText("login..");
         login.setTranslateX(125);
         login.setTranslateY(100);
         login.setStyle("-fx-border-color:green");
         login.setFocusTraversable(false);
 
-        PasswordField password = new PasswordField();
+        password = new PasswordField();
         password.setPromptText("password..");
         password.setTranslateX(125);
         password.setTranslateY(140);
@@ -113,9 +117,12 @@ public class Bank extends Application {
                     try {
                         ResultSet rs = connectToDB().executeQuery("select password from users where login='" + lg + "';");
                         while (rs.next()) {
-                            System.out.println(rs.getString(1));
-                            pss = rs.getString(1);
-
+                            if(password.getText().equals(rs.getString(1))){
+                                pss = rs.getString(1);
+                            }
+                            else{
+                                error2.setVisible(true);
+                            }
                         }
                         rs.close();
                         st.close();
@@ -142,12 +149,11 @@ public class Bank extends Application {
                             System.out.println(ex.getMessage());
                         }
                         
-
                         Rectangle rec = new Rectangle(500, 550);//frame
                         rec.setTranslateX(370);
                         rec.setTranslateY(20);
                         rec.setFill(Color.TRANSPARENT);
-                        rec.setStroke(Color.GRAY);
+                        rec.setStroke(Color.GREEN);
                         rec.setArcHeight(75);
                         rec.setArcWidth(75);
 
@@ -304,10 +310,10 @@ public class Bank extends Application {
                         others.setTranslateY(580);
                         others.setStyle("-fx-background-color:green");
                         
-                        Button exitFromProfile = new Button("Exit");
+                        Button exitFromProfile = new Button("exit");
                         exitFromProfile.setTranslateX(1);
                         exitFromProfile.setTranslateY(1);
-                        exitFromProfile.setStyle("-fx-background-color:green");
+                        exitFromProfile.setStyle("-fx-background-color:CADETBLUE");
 
                         add.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
@@ -316,7 +322,6 @@ public class Bank extends Application {
                                     blogtxt.setStyle("-fx-border-color:green");
                                     Timestamp ts = new Timestamp(System.currentTimeMillis());
                                     ObservableList<String> tempList = FXCollections.observableArrayList();
-
                                     tempList.add(blogtxt.getText().toString() + "\n" + ts.toString());
                                     tempList.addAll(arr);
                                     arr.clear();
@@ -330,14 +335,12 @@ public class Bank extends Application {
                                     } catch (SQLException ex) {
                                         System.out.println(ex.getMessage());
                                     }
-                                    System.out.println("hello");
                                     blogtxt.clear();
                                 } else {
                                     blogtxt.setStyle("-fx-border-color:red");
                                 }
                             }
                         });
-
                         edit1.setOnMouseClicked(new EventHandler<MouseEvent>() {
                             @Override
                             public void handle(MouseEvent event) {
@@ -524,14 +527,15 @@ public class Bank extends Application {
                                 }
                             }
                         });
-                        
                         exitFromProfile.setOnMouseClicked(new EventHandler<MouseEvent>(){
                             @Override
                             public void handle(MouseEvent event) {
                                 profStage.close();
+                                loginStage.show();
+                                login.clear();
+                                password.clear();
                             }
                         });
-
                         others.setOnMouseClicked(new EventHandler<MouseEvent>() {
                             @Override
                             public void handle(MouseEvent event) {
@@ -541,93 +545,92 @@ public class Bank extends Application {
                                 allStage.setScene(new Scene(allroot, 900, 640));
                                 allStage.setResizable(false);
                                 allStage.show();
-
-                               
-                                try {
-                                    profileOfUsers = new ListView<>( FXCollections.observableArrayList(new Item("Sobachka Dadly",new Image(new FileInputStream("/Users/macbookair/NetBeansProjects/JavaFXExample/game1.jpg"))),
-                                            new Item("Sobachka Sadly",new Image(new FileInputStream("/Users/macbookair/NetBeansProjects/JavaFXExample/game1.jpg")))));
-                                } catch (FileNotFoundException ex) {
-                                    Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, ex);
-                                }
+                                
+                                Rectangle rec1 = new Rectangle(280, 520);//frame
+                                rec1.setTranslateX(85);
+                                rec1.setTranslateY(60);
+                                rec1.setFill(Color.TRANSPARENT);
+                                rec1.setStroke(Color.GREEN);
+                                rec1.setArcHeight(75);
+                                rec1.setArcWidth(75);
+                                
+                                Rectangle rec2 = new Rectangle(490, 520);//frame
+                                rec2.setTranslateX(375);
+                                rec2.setTranslateY(60);
+                                rec2.setFill(Color.TRANSPARENT);
+                                rec2.setStroke(Color.GREEN);
+                                rec2.setArcHeight(75);
+                                rec2.setArcWidth(75);
+                        
+                                ListView<Pane> profileOfUsers = new ListView<>();
                                 profileOfUsers.setTranslateX(100);
-                                profileOfUsers.setTranslateY(50);
+                                profileOfUsers.setTranslateY(70);
                                 profileOfUsers.setMinHeight(500);
-                                profileOfUsers.setMinWidth(100);
+                                profileOfUsers.setMinWidth(100);                  
                                 profileOfUsers.setFocusTraversable(false);
 
                                 ListView blogOfUser = new ListView<>();
                                 blogOfUser.setTranslateX(390);
-                                blogOfUser.setTranslateY(50);
+                                blogOfUser.setTranslateY(70);
                                 blogOfUser.setMinHeight(500);
                                 blogOfUser.setMinWidth(460);
                                 blogOfUser.setFocusTraversable(false);
                                 
-                                 profileOfUsers.setCellFactory(listView -> new ListCell<Item>() {
-                                    @Override
-                                    public void updateItem(Item item, boolean empty) {
-                                            if (empty) {
-                                                setText("");
-                                                setGraphic(null);
-                                            } else {
-                                                setText(item.text);
-                                                setGraphic(item.imgv);
-                                            }
-                                        }
-
-                                    });
-                                ArrayList<String> loginOfUsers = new ArrayList<>();
+                                Text text1 = new Text("All users");
+                                text1.setTranslateX(170);
+                                text1.setTranslateY(50);
+                                text1.setStyle("-fx-font-size:20");
+                                text1.setFill(Color.GREEN);
                                 
-                                Button back = new Button("Back to profile");
-                                back.setTranslateX(742);
-                                back.setTranslateY(560);
-                                back.setStyle("-fx-background-color:green");
-                                
-                                Button exitFromBlogs = new Button("Exit");
-                                exitFromBlogs.setTranslateX(1);
-                                exitFromBlogs.setTranslateY(1);
-                                exitFromBlogs.setStyle("-fx-background-color:green");
+                                Text text2 = new Text("Blogs");
+                                text2.setTranslateX(570);
+                                text2.setTranslateY(50);
+                                text2.setStyle("-fx-font-size:20");
+                                text2.setFill(Color.GREEN);
+                    
+                                Button back = new Button("back");
+                                back.setTranslateX(1);
+                                back.setTranslateY(1);
+                                back.setStyle("-fx-background-color:CADETBLUE");
 
                                 back.setOnAction(new EventHandler<ActionEvent>() {
                                     @Override
                                     public void handle(ActionEvent event) {
                                         allStage.close();
                                         profStage.show();
+                                        login.clear();
+                                        password.clear();
                                     }
                                 });
-
+                                Pane pane = null;
                                 String ref = null;
                                 Circle imageOfUser = null;
-
                                 Image img = null;
-                                ObservableList<Item> items = FXCollections.observableArrayList();
-                                ObservableList<Circle> arr2 = FXCollections.observableArrayList();
+                                ObservableList<Pane> panes = FXCollections.observableArrayList();
                                 Rectangle rec = new Rectangle(150,50);
                                 
+                                ArrayList<String> loginOfUsers = new ArrayList<>();
                                 try {
-                                    ResultSet rs = connectToDB().executeQuery("select login,image from users where login <> '"+lg+"';");
-                                    while (rs.next()) {
-                                        
-                                        imageOfUser = new Circle(30);
+                                    ResultSet rs = connectToDB().executeQuery("select login,image, name, surname from users where login <> '"+lg+"';");
+                                    while (rs.next()) {  
+                                        pane = new Pane();
+                                        Text text = new Text(rs.getString(3)+" "+rs.getString(4));
+                                        pane.setPrefSize(100, 50);
+                                        imageOfUser = new Circle(24);
                                         imageOfUser.setStroke(Color.GREEN);
                                         loginOfUsers.add(rs.getString(1));
                                         ref2 = rs.getBinaryStream("image");//reference
-                                        System.out.println(ref2.toString());
-                                        img = new Image(ref2);
-                                        
+                                        img = new Image(ref2);                                       
                                         imageOfUser.setFill(new ImagePattern(img));
-                                        arr2.add(imageOfUser);
-                                        
-                                        
-                                        
-                                        items.add(new Item(rs.getString(1),new Image(ref2)));
-                                        
-                                        
+                                        imageOfUser.setTranslateX(20);
+                                        imageOfUser.setTranslateY(25);
+                                        text.setTranslateX(65);
+                                        text.setTranslateY(30);
+                                        pane.getChildren().add(imageOfUser);
+                                        pane.getChildren().add(text);
+                                        panes.add(pane);
                                     }
-                                    
-                                   
-
-
-                                    //profileOfUsers.setItems(arr2);
+                                    profileOfUsers.setItems(panes);
                                     rs.close();
                                     st.close();
                                 } catch (SQLException ex) {
@@ -638,23 +641,22 @@ public class Bank extends Application {
                                 try {
                                     posts = connectToDB().executeQuery("select blog, post_date from posts where user_log='" + loginOfUsers.get(0) + "' order by post_date DESC");
                                     while (posts.next()) {
-                                        postsOfFirst.put(posts.getString(2), posts.getString(1));//key, value                                           
+                                        postsOfFirst.put(posts.getString(2), posts.getString(1));//key, value 
                                     }
                                     posts.close();
                                 } catch (SQLException ex) {
                                     System.out.println(ex.getMessage());
                                 }
-                                                   ObservableList<String> arr = FXCollections.observableArrayList();
-                                                    for(Entry en : postsOfFirst.entrySet()){
-                                                        arr.add(en.getValue().toString()+"\n"+en.getKey().toString());
-                                                    }                     
-                                                blogOfUser.setItems(arr);
+                                ObservableList<String> arr = FXCollections.observableArrayList();
+                                for(Entry en : postsOfFirst.entrySet()){
+                                    arr.add(en.getValue().toString()+"\n"+en.getKey().toString());
+                                }                     
+                                blogOfUser.setItems(arr);
                                 profileOfUsers.setOnMouseClicked(new EventHandler<MouseEvent>() {
                                     @Override
                                     public void handle(MouseEvent event) {
                                         String loginForList = loginOfUsers.get(profileOfUsers.getSelectionModel().getSelectedIndex());
                                         LinkedHashMap<String, String> postsOfUser = new LinkedHashMap<>();//Posts 
-                                        System.out.println(loginForList);
                                         ResultSet posts = null;
                                         try {
                                             posts = connectToDB().executeQuery("select blog, post_date from posts where user_log='" + loginForList + "' order by post_date DESC");
@@ -673,29 +675,19 @@ public class Bank extends Application {
                                     }
                                 });
                                 
-                                exitFromBlogs.setOnMouseClicked(new EventHandler<MouseEvent>(){
-                                    @Override
-                                    public void handle(MouseEvent event) {
-                                        allStage.close();
-                                    }
-                        });
 
-                                allroot.getChildren().addAll(profileOfUsers, blogOfUser, back, exitFromBlogs);
-                                allStage.setTitle("All profiles");
-                                
+                                allroot.getChildren().addAll(rec1,rec2,profileOfUsers,blogOfUser, text1,text2,back);
+                                allStage.setTitle("All profiles");       
                             }   
                         });
-
                         profroot.getChildren().addAll(ntext, ntext2, stext, stext2,
                                 phtext, phtext2, datetext, datetext2, postext, postext2, saltext, saltext2,
                                 pf1, pf2, pf3, pf4, pf5, pf6, rec, myblog, blogtxt, add, accept, cancel, list, others,
                                 edit1, edit2, edit3, edit4, edit5, edit6,exitFromProfile);
                         profStage.setTitle("My profile");
-
                         try {
                             ResultSet rs = connectToDB().executeQuery("select name, surname, phone_number, dateofb, position, salary,image from users where login='" + lg + "';");
                             while (rs.next()) {
-                                System.out.println(rs.getString(1));
                                 ntext.setText(rs.getString(1));
                                 stext.setText(rs.getString(2));
                                 phtext.setText(rs.getString(3));
@@ -705,7 +697,6 @@ public class Bank extends Application {
                                 ref2 = rs.getBinaryStream("image");
                                 ref = rs.getString(7);//reference
                             }
-                            System.out.println(ref);
                             Circle circle = new Circle(200, 110, 90);
                             Circle imageOfUser = new Circle(30);
                             circle.setStroke(Color.GREEN);
@@ -727,95 +718,88 @@ public class Bank extends Application {
                         
         txt2.setOnMouseClicked(new EventHandler<MouseEvent>() {//Регистрация
             File fileImage = null;
-
             @Override
             public void handle(MouseEvent event) {
                 loginStage.close();
                 Stage regStage = new Stage();//Регистрация
                 Group regroot = new Group();
+                Scene regScene = new Scene(regroot, 400, 600);
 
                 TextField name = new TextField();
+                name.setTranslateX(160);
+                name.setTranslateY(82);
                 Text nametext = new Text("*Name");
+                nametext.setTranslateX(60);
+                nametext.setTranslateY(100);
 
                 TextField sname = new TextField();
+                sname.setTranslateX(160);
+                sname.setTranslateY(122);
                 Text snametext = new Text("*Surname");
+                snametext.setTranslateX(60);
+                snametext.setTranslateY(140);
 
                 DatePicker dateofb = new DatePicker();
+                dateofb.setTranslateX(160);
+                dateofb.setTranslateY(162);
+                dateofb.setPrefSize(168, 1);
                 Text dateofbtext = new Text("*Date of Birth");
-                dateofb.maxWidth(300);
-                dateofb.setStyle("-fx-font-size:11");
-
+                dateofbtext.setTranslateX(60);
+                dateofbtext.setTranslateY(180);
+                
                 TextField log = new TextField();
+                log.setTranslateX(160);
+                log.setTranslateY(202);
                 Text logtext = new Text("*Login");
+                logtext.setTranslateX(60);
+                logtext.setTranslateY(220);
 
                 PasswordField pass = new PasswordField();
+                pass.setTranslateX(160);
+                pass.setTranslateY(242);
                 Text passtext = new Text("*Password");
+                passtext.setTranslateX(60);
+                passtext.setTranslateY(260);
 
                 TextField phonenumber = new TextField();
                 Text phonenumbertext = new Text("Phone_number");
-
-                TextField position = new TextField();
-                Text positiontext = new Text("Position");
-
-                TextField salary = new TextField();
-                Text salarytext = new Text("Salary");
-
-                TextField image = new TextField();
-                Text imagetext = new Text("*Image");
-
-                Button saveImage = new Button("Select Image");
-                FileChooser fc = new FileChooser();
-
-                Button reg = new Button("Register");
-                reg.setStyle("-fx-background-color:green");
-
-                nametext.setTranslateX(60);
-                nametext.setTranslateY(100);
-                name.setTranslateX(160);
-                name.setTranslateY(82);
-
-                snametext.setTranslateX(60);
-                snametext.setTranslateY(140);
-                sname.setTranslateX(160);
-                sname.setTranslateY(122);
-
-                dateofbtext.setTranslateX(60);
-                dateofbtext.setTranslateY(180);
-                dateofb.setTranslateX(160);
-                dateofb.setTranslateY(162);
-
-                logtext.setTranslateX(60);
-                logtext.setTranslateY(220);
-                log.setTranslateX(160);
-                log.setTranslateY(202);
-
-                passtext.setTranslateX(60);
-                passtext.setTranslateY(260);
-                pass.setTranslateX(160);
-                pass.setTranslateY(242);
-
                 phonenumbertext.setTranslateX(60);
                 phonenumbertext.setTranslateY(300);
                 phonenumber.setTranslateX(160);
                 phonenumber.setTranslateY(282);
 
+                TextField position = new TextField();
+                Text positiontext = new Text("Position");
                 positiontext.setTranslateX(60);
                 positiontext.setTranslateY(340);
                 position.setTranslateX(160);
                 position.setTranslateY(322);
 
+                TextField salary = new TextField();
+                Text salarytext = new Text("Salary");
                 salarytext.setTranslateX(60);
                 salarytext.setTranslateY(380);
                 salary.setTranslateX(160);
                 salary.setTranslateY(362);
 
+                TextField image = new TextField();
+                image.setEditable(false);
+                Text imagetext = new Text("*Image");
                 imagetext.setTranslateX(60);
                 imagetext.setTranslateY(420);
                 image.setTranslateX(160);
                 image.setTranslateY(402);
+                image.setPrefSize(168,1);
 
-                reg.setTranslateX(180);
-                reg.setTranslateY(440);
+                Button saveImage = new Button("📷");//Image
+                saveImage.setTranslateX(296);
+                saveImage.setTranslateY(402);
+                FileChooser fc = new FileChooser();
+
+                Button reg = new Button("Register");
+                reg.setStyle("-fx-background-color:green");
+                reg.setTranslateX(190);
+                reg.setTranslateY(460);//440
 
                 Text error = new Text("You need to fill in all the required fields(*)");
                 error.setTranslateX(80);
@@ -823,30 +807,79 @@ public class Bank extends Application {
                 error.setFill(Color.RED);
                 error.setVisible(false);
                 
+                Text error3 = new Text("This login already exist");
+                error3.setTranslateX(140);
+                error3.setTranslateY(540);
+                error3.setFill(Color.RED);
+                error3.setVisible(false);
+                
+                Text error4 = new Text("Password must contain at least 8 characters");
+                error4.setTranslateX(80);
+                error4.setTranslateY(540);
+                error4.setFill(Color.RED);
+                error4.setVisible(false);
+                
+                Button exitFromReg = new Button("exit");
+                exitFromReg.setTranslateX(1);
+                exitFromReg.setTranslateY(1);
+                exitFromReg.setStyle("-fx-background-color:CADETBLUE");
+                
+                pass.setOnMouseMoved(new EventHandler<MouseEvent>(){
+                    @Override
+                    public void handle(MouseEvent event) {
+                        if(pass.getText().length()<8){
+                            error4.setVisible(true);
+                        }
+                        else{
+                            error4.setVisible(false);
+                        }
+                    }
+                });
+
+                exitFromReg.setOnMouseClicked(new EventHandler<MouseEvent>(){
+                    @Override
+                    public void handle(MouseEvent event) {
+                    regStage.close();
+                    loginStage.show();
+                    }
+                });
+                
                 ArrayList<String> allLogins = new ArrayList<>();
                 try {
-                    ResultSet rs = connectToDB().executeQuery("select login from users");
+                     rs = connectToDB().executeQuery("select login from users");
                     while(rs.next()){
                         allLogins.add(rs.getString(1));
+                        
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
+                regScene.setOnMouseMoved(new EventHandler<MouseEvent>(){
+                        @Override
+                        public void handle(MouseEvent event) {
+                            if(allLogins.contains(log.getText())){
+                                error3.setVisible(true);                             
+                                }
+                            else{
+                                error3.setVisible(false);
+                            }
+                        }
+                    });
+                
                 Desktop desktop = Desktop.getDesktop();
                 saveImage.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
                         fileImage = fc.showOpenDialog(regStage);
-
+                        if(fileImage != null){
+                            image.setText(fileImage.getName());                           
+                        }
                     }
                 });
 
                 reg.setOnAction(new EventHandler<ActionEvent>() {//Логин
-
                     @Override
                     public void handle(ActionEvent event) {
-                        System.out.println(fileImage.getName());
                         if (name.getText().toString().equals("") || dateofb.getValue().toString().equals("") || sname.getText().toString().equals("") || log.getText().toString().equals("") || pass.getText().toString().equals("") || image.getText().toString().equals("")) {
                             error.setVisible(true);
                         } else {
@@ -854,7 +887,7 @@ public class Bank extends Application {
                             loginStage.show();//Логин
                             String logdb = log.getText().toString();
                             String passdb = pass.getText().toString();
-                            int phone_numbdb = Integer.parseInt(phonenumber.getText().toString());
+                            int phone_numbdb = Integer.parseInt(phonenumber.getText());
                             String namedb = name.getText().toString();
                             String surnamedb = sname.getText().toString();
                             String datedb = dateofb.getValue().toString();
@@ -867,12 +900,11 @@ public class Bank extends Application {
                             } catch (FileNotFoundException ex) {
                                 Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, ex);
                             }
-
                             try {
                                 Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/bank", "postgres", "1425");
                                 PreparedStatement ps = con.prepareStatement("insert into users(login, password, phone_number, name, surname, dateofb, position, salary, image) values('" + logdb + "','" + passdb + "','" + phone_numbdb + "','" + namedb + "','" + surnamedb + "','" + datedb + "','" + positiondb + "','" + salarydb + "',?)");
 
-                                ps.setBinaryStream(1, (FileInputStream) stream, (int) fileImage.length());
+                                ps.setBinaryStream(1, (InputStream) stream, (int) fileImage.length());
                                 ps.executeUpdate();
                                 ps.close();
                             } catch (SQLException ex) {
@@ -880,19 +912,16 @@ public class Bank extends Application {
                             }
                         }
                     }
-
                 });
-
                 regroot.getChildren().addAll(name, nametext, sname, snametext,
                         dateofb, dateofbtext, log, logtext, pass, passtext,
                         phonenumber, phonenumbertext, position, positiontext,
-                        salary, salarytext, image, imagetext, reg, error, saveImage);
+                        salary, salarytext, image, imagetext, reg, error,error3,error4,saveImage,exitFromReg);
                 regStage.setTitle("Register");
-                regStage.setScene(new Scene(regroot, 400, 600));
+                regStage.setScene(regScene);
                 regStage.show();
             }
         });
-
         loginroot.getChildren().addAll(login, password, signin, txt1, txt2, error2);
         loginStage.setTitle("Blog");
         loginStage.setScene(new Scene(loginroot, 400, 400));
@@ -901,16 +930,5 @@ public class Bank extends Application {
 
     public static void main(String[] args) {
         launch(args);
-    }
-}
-class Item{
-    String text;
-    ImageView imgv;
-    
-    public Item(String text, Image img){
-        this.text = text;
-        this.imgv = new ImageView(img);
-        imgv.setFitWidth(70);
-        imgv.setFitHeight(70);
     }
 }
