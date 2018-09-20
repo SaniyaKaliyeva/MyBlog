@@ -52,6 +52,7 @@ public class Bank extends Application {
     PasswordField password;
     TextField login;
     ResultSet rs;
+    Circle circle;
 
     public Statement connectToDB() {
         try {
@@ -107,7 +108,7 @@ public class Bank extends Application {
 
         signin.setOnAction(new EventHandler<ActionEvent>() {
             boolean isEdit = true;
-
+            File  fileImage = null;
             @Override
             public void handle(ActionEvent event) {
                 if (!login.getText().toString().equals("") && !password.getText().toString().equals("")) {
@@ -174,6 +175,8 @@ public class Bank extends Application {
                         add.setTranslateX(790);
                         add.setTranslateY(140);
                         add.setStyle("-fx-background-color:green");
+                        
+                        
 
                         ListView list = new ListView();
                         list.setTranslateX(390);
@@ -685,6 +688,21 @@ public class Bank extends Application {
                                 pf1, pf2, pf3, pf4, pf5, pf6, rec, myblog, blogtxt, add, accept, cancel, list, others,
                                 edit1, edit2, edit3, edit4, edit5, edit6,exitFromProfile);
                         profStage.setTitle("My profile");
+                        Button changeImage = new Button();//Image
+                        changeImage.setTranslateX(235);
+                        changeImage.setTranslateY(175);
+                        FileChooser fc = new FileChooser();
+                        try {
+                            Image imageCam = new Image(new FileInputStream("/Users/macbookair/Desktop/camera.png"));
+                            ImageView imgvv = new ImageView(imageCam);
+                            imgvv.setFitWidth(15);
+                            imgvv.setFitHeight(15);
+                            changeImage.setGraphic(imgvv);
+                                    } catch (FileNotFoundException ex) {
+                            Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        
+                        
                         try {
                             ResultSet rs = connectToDB().executeQuery("select name, surname, phone_number, dateofb, position, salary,image from users where login='" + lg + "';");
                             while (rs.next()) {
@@ -697,18 +715,55 @@ public class Bank extends Application {
                                 ref2 = rs.getBinaryStream("image");
                                 ref = rs.getString(7);//reference
                             }
-                            Circle circle = new Circle(200, 110, 90);
-                            Circle imageOfUser = new Circle(30);
+                            circle = new Circle(200, 110, 90);
                             circle.setStroke(Color.GREEN);
                             Image im = new Image(ref2);
                             circle.setFill(new ImagePattern(im));
-                            imageOfUser.setFill(new ImagePattern(im));
-                            profroot.getChildren().addAll(circle);
+                            
+                            profroot.getChildren().addAll(circle,changeImage);
                             rs.close();
                             st.close();
                         } catch (SQLException ex) {
                             Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        changeImage.setOnAction(new EventHandler<ActionEvent>(){
+                            @Override
+                            public void handle(ActionEvent event) {
+                                fileImage = fc.showOpenDialog(profStage);
+                                if(fileImage != null){
+                                    FileInputStream stream = null;
+                                    try {
+                                        stream = new FileInputStream(fileImage);
+                                    } catch (FileNotFoundException ex) {
+                                        Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                    try {
+                                        Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/bank", "postgres", "1425");
+                                        PreparedStatement ps = con.prepareStatement("update users set image=? where login='"+lg+"'");
+                                        
+
+                                        ps.setBinaryStream(1, (InputStream) stream, (int) fileImage.length());
+                                        ps.executeUpdate();
+                                        ps.close();
+                                    
+                                    } catch (SQLException ex) {
+                                        Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                    
+                                    try{
+                                       ResultSet rs = connectToDB().executeQuery("select image from users where login='" + lg + "';");
+                                       ref2 = rs.getBinaryStream("image");
+                                       Image im = new Image(ref2);
+                                       circle.setFill(new ImagePattern(im));
+                                    }
+                                    catch(SQLException ex){
+                                        
+                                    }
+                                    
+                                }
+                            }
+                            
+                        });
                     }
                 } else {
                     error2.setVisible(true);
@@ -790,11 +845,22 @@ public class Bank extends Application {
                 image.setTranslateX(160);
                 image.setTranslateY(402);
                 image.setPrefSize(168,1);
-
-                Button saveImage = new Button("📷");//Image
+                
+                
+                Button saveImage = new Button();//Image
                 saveImage.setTranslateX(296);
                 saveImage.setTranslateY(402);
                 FileChooser fc = new FileChooser();
+                try {
+                    Image imageCam = new Image(new FileInputStream("/Users/macbookair/Desktop/camera.png"));
+                    ImageView imgvv = new ImageView(imageCam);
+                    imgvv.setFitWidth(15);
+                    imgvv.setFitHeight(15);
+                    saveImage.setGraphic(imgvv);
+                            } catch (FileNotFoundException ex) {
+                    Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
 
                 Button reg = new Button("Register");
                 reg.setStyle("-fx-background-color:green");
@@ -824,17 +890,17 @@ public class Bank extends Application {
                 exitFromReg.setTranslateY(1);
                 exitFromReg.setStyle("-fx-background-color:CADETBLUE");
                 
-                pass.setOnMouseMoved(new EventHandler<MouseEvent>(){
-                    @Override
-                    public void handle(MouseEvent event) {
-                        if(pass.getText().length()<8){
-                            error4.setVisible(true);
-                        }
-                        else{
-                            error4.setVisible(false);
-                        }
-                    }
-                });
+//                pass.setOnMouseMoved(new EventHandler<MouseEvent>(){
+//                    @Override
+//                    public void handle(MouseEvent event) {
+//                        if(pass.getText().length()<8){
+//                            error4.setVisible(true);
+//                        }
+//                        else{
+//                            error4.setVisible(false);
+//                        }
+//                    }
+//                });
 
                 exitFromReg.setOnMouseClicked(new EventHandler<MouseEvent>(){
                     @Override
@@ -880,14 +946,30 @@ public class Bank extends Application {
                 reg.setOnAction(new EventHandler<ActionEvent>() {//Логин
                     @Override
                     public void handle(ActionEvent event) {
-                        if (name.getText().toString().equals("") || dateofb.getValue().toString().equals("") || sname.getText().toString().equals("") || log.getText().toString().equals("") || pass.getText().toString().equals("") || image.getText().toString().equals("")) {
-                            error.setVisible(true);
-                        } else {
+                         
+                        if (!name.getText().toString().equals("") || !dateofb.getValue().toString().equals("") || !sname.getText().toString().equals("") || 
+                                !log.getText().toString().equals("") || !pass.getText().toString().equals("") || !image.getText().toString().equals("")) {
+                            error.setVisible(false);    
+                        } 
+                        if(pass.getText().length()>8){
+                            error4.setVisible(false);
+                        }
+                        if(pass.getText().length()<8){
+                            error4.setVisible(true);
+                        }
+                        if (name.getText().toString().equals("") || dateofb.getValue().toString().equals("") 
+                                || sname.getText().toString().equals("") || log.getText().toString().equals("") 
+                                || pass.getText().toString().equals("") || image.getText().toString().equals("")
+                                ) {
+                            error.setVisible(true);    
+                        }
+                        if(!name.getText().toString().equals("") && !dateofb.getValue().toString().equals("") && !sname.getText().toString().equals("") && 
+                                !log.getText().toString().equals("") && !pass.getText().toString().equals("") && !image.getText().toString().equals("") && pass.getText().length()>8) {
                             regStage.close();
                             loginStage.show();//Логин
                             String logdb = log.getText().toString();
                             String passdb = pass.getText().toString();
-                            int phone_numbdb = Integer.parseInt(phonenumber.getText());
+                            double phone_numbdb = Double.parseDouble(phonenumber.getText());
                             String namedb = name.getText().toString();
                             String surnamedb = sname.getText().toString();
                             String datedb = dateofb.getValue().toString();
