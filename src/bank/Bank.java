@@ -53,6 +53,9 @@ public class Bank extends Application {
     TextField login;
     ResultSet rs;
     Circle circle;
+    TextArea blogtxt;
+    Button add;
+    ResultSet posts = null;
 
     public Statement connectToDB() {
         try {
@@ -139,24 +142,33 @@ public class Bank extends Application {
                         profStage.setResizable(false);
                         profStage.show();
                         LinkedHashMap<String, String> postsOfUser = new LinkedHashMap<>();//Posts                            
-                        ResultSet posts = null;
+                        
                         try {
                             posts = connectToDB().executeQuery("select blog, post_date from posts where user_log = '" + lg + "' order by post_date DESC");
                             while (posts.next()) {
-                                postsOfUser.put(posts.getString(2), posts.getString(1));//key, value                                           
+                                postsOfUser.put(posts.getString(2), posts.getString(1));//key, value 
+                                
                             }
                             posts.close();
                         } catch (SQLException ex) {
                             System.out.println(ex.getMessage());
                         }
                         
-                        Rectangle rec = new Rectangle(500, 550);//frame
-                        rec.setTranslateX(370);
-                        rec.setTranslateY(20);
-                        rec.setFill(Color.TRANSPARENT);
-                        rec.setStroke(Color.GREEN);
-                        rec.setArcHeight(75);
-                        rec.setArcWidth(75);
+                        Rectangle rec1 = new Rectangle(500, 550);//frame
+                        rec1.setTranslateX(370);
+                        rec1.setTranslateY(20);
+                        rec1.setFill(Color.TRANSPARENT);
+                        rec1.setStroke(Color.GREEN);
+                        rec1.setArcHeight(75);
+                        rec1.setArcWidth(75);
+                        
+                        Rectangle rec2 = new Rectangle(285, 355);//frame
+                        rec2.setTranslateX(70);
+                        rec2.setTranslateY(215);
+                        rec2.setFill(Color.TRANSPARENT);
+                        rec2.setStroke(Color.GREEN);
+                        rec2.setArcHeight(75);
+                        rec2.setArcWidth(75);
 
                         Text myblog = new Text("My blogs");
                         myblog.setTranslateX(390);
@@ -164,21 +176,31 @@ public class Bank extends Application {
                         myblog.setStyle("-fx-font-size:20");
                         myblog.setFill(Color.GREEN);
 
-                        TextArea blogtxt = new TextArea();
+                        blogtxt = new TextArea();
                         blogtxt.setTranslateX(390);
                         blogtxt.setTranslateY(60);
                         blogtxt.setStyle("-fx-font-size:120");
                         blogtxt.setPrefSize(460, 75);
                         blogtxt.setStyle("-fx-border-color:green");
 
-                        Button add = new Button("  Add  ");
+                        add = new Button("  Add  ");
                         add.setTranslateX(790);
                         add.setTranslateY(140);
                         add.setStyle("-fx-background-color:green");
                         
+                        Button apply = new Button("Apply");
+                        apply.setTranslateX(730);
+                        apply.setTranslateY(140);
+                        apply.setStyle("-fx-background-color:CADETBLUE");
+                        apply.setVisible(false);
                         
+                        Button cancel2 = new Button("Cancel");
+                        cancel2.setTranslateX(660);
+                        cancel2.setTranslateY(140);
+                        cancel2.setStyle("-fx-background-color:CADETBLUE");
+                        cancel2.setVisible(false);
 
-                        ListView list = new ListView();
+                        ListView list = new ListView();//Blogs in profileStage
                         list.setTranslateX(390);
                         list.setTranslateY(180);
                         list.setMaxHeight(370);
@@ -192,126 +214,139 @@ public class Bank extends Application {
                         Text ntext2 = new Text("Name:");
                         ntext2.setStyle("-fx-font-size:15");
                         ntext2.setFill(Color.GREEN);
-                        ntext2.setTranslateX(92);
+                        ntext2.setTranslateX(80);
                         ntext2.setTranslateY(250);
                         Text ntext = new Text();
-                        ntext.setTranslateX(200);
+                        ntext.setTranslateX(190);
                         ntext.setTranslateY(250);
                         TextField pf1 = new TextField();
-                        pf1.setTranslateX(200);
+                        pf1.setTranslateX(190);
                         pf1.setTranslateY(230);
                         pf1.setMaxWidth(125);
                         pf1.setStyle("-fx-border-color:green");
                         pf1.setVisible(false);
                         Button edit1 = new Button("✎");
-                        edit1.setTranslateX(325);
+                        edit1.setTranslateX(315);
                         edit1.setTranslateY(230);
 
                         Text stext2 = new Text("Surname:");
                         stext2.setStyle("-fx-font-size:15");
                         stext2.setFill(Color.GREEN);
-                        stext2.setTranslateX(92);
+                        stext2.setTranslateX(80);
                         stext2.setTranslateY(300);
                         Text stext = new Text();
-                        stext.setTranslateX(200);
+                        stext.setTranslateX(190);
                         stext.setTranslateY(300);
                         TextField pf2 = new TextField();
-                        pf2.setTranslateX(200);
+                        pf2.setTranslateX(190);
                         pf2.setTranslateY(280);
                         pf2.setMaxWidth(125);
                         pf2.setStyle("-fx-border-color:green");
                         pf2.setVisible(false);
                         Button edit2 = new Button("✎");
-                        edit2.setTranslateX(325);
+                        edit2.setTranslateX(315);
                         edit2.setTranslateY(280);
 
                         Text phtext2 = new Text("Phone number:");
                         phtext2.setStyle("-fx-font-size:15");
                         phtext2.setFill(Color.GREEN);
-                        phtext2.setTranslateX(92);
+                        phtext2.setTranslateX(80);
                         phtext2.setTranslateY(350);
                         Text phtext = new Text();
-                        phtext.setTranslateX(200);
+                        phtext.setTranslateX(190);
                         phtext.setTranslateY(350);
                         TextField pf3 = new TextField();
-                        pf3.setTranslateX(200);
+                        pf3.setTranslateX(190);
                         pf3.setTranslateY(330);
                         pf3.setMaxWidth(125);
                         pf3.setStyle("-fx-border-color:green");
                         pf3.setVisible(false);
                         Button edit3 = new Button("✎");
-                        edit3.setTranslateX(325);
+                        edit3.setTranslateX(315);
                         edit3.setTranslateY(330);
 
                         Text datetext2 = new Text("Date of birth:");
                         datetext2.setStyle("-fx-font-size:15");
                         datetext2.setFill(Color.GREEN);
-                        datetext2.setTranslateX(92);
+                        datetext2.setTranslateX(80);
                         datetext2.setTranslateY(400);
                         Text datetext = new Text();
-                        datetext.setTranslateX(200);
+                        datetext.setTranslateX(190);
                         datetext.setTranslateY(400);
                         TextField pf4 = new TextField();
-                        pf4.setTranslateX(200);
+                        pf4.setTranslateX(190);
                         pf4.setTranslateY(380);
                         pf4.setMaxWidth(125);
                         pf4.setStyle("-fx-border-color:green");
                         pf4.setVisible(false);
                         Button edit4 = new Button("✎");
-                        edit4.setTranslateX(325);
+                        edit4.setTranslateX(315);
                         edit4.setTranslateY(380);
 
                         Text postext2 = new Text("Position:");
                         postext2.setStyle("-fx-font-size:15");
                         postext2.setFill(Color.GREEN);
-                        postext2.setTranslateX(92);
+                        postext2.setTranslateX(80);
                         postext2.setTranslateY(450);
                         Text postext = new Text();
-                        postext.setTranslateX(200);
+                        postext.setTranslateX(190);
                         postext.setTranslateY(450);
                         TextField pf5 = new TextField();
-                        pf5.setTranslateX(200);
+                        pf5.setTranslateX(190);
                         pf5.setTranslateY(430);
                         pf5.setMaxWidth(125);
                         pf5.setStyle("-fx-border-color:green");
                         pf5.setVisible(false);
                         Button edit5 = new Button("✎");
-                        edit5.setTranslateX(325);
+                        edit5.setTranslateX(315);
                         edit5.setTranslateY(430);
 
                         Text saltext2 = new Text("Salary:");
                         saltext2.setStyle("-fx-font-size:15");
                         saltext2.setFill(Color.GREEN);
-                        saltext2.setTranslateX(92);
+                        saltext2.setTranslateX(80);
                         saltext2.setTranslateY(500);
                         Text saltext = new Text();
-                        saltext.setTranslateX(200);
+                        saltext.setTranslateX(190);
                         saltext.setTranslateY(500);
                         TextField pf6 = new TextField();
-                        pf6.setTranslateX(200);
+                        pf6.setTranslateX(190);
                         pf6.setTranslateY(480);
                         pf6.setMaxWidth(125);
                         pf6.setStyle("-fx-border-color:green");
                         pf6.setVisible(false);
                         Button edit6 = new Button("✎");
-                        edit6.setTranslateX(325);
+                        edit6.setTranslateX(315);
                         edit6.setTranslateY(480);
 
                         Button accept = new Button("Accept");
                         accept.setTranslateX(230);
-                        accept.setTranslateY(540);
+                        accept.setTranslateY(580);
                         accept.setVisible(false);
                         accept.setStyle("-fx-background-color:green");
 
                         Button cancel = new Button("Cancel");
                         cancel.setTranslateX(150);
-                        cancel.setTranslateY(540);
+                        cancel.setTranslateY(580);
                         cancel.setVisible(false);
+                        cancel.setStyle("-fx-background-color:CADETBLUE");
 
                         Button others = new Button("See more blogs...");
-                        others.setTranslateX(570);
+                        others.setTranslateX(725);
                         others.setTranslateY(580);
                         others.setStyle("-fx-background-color:green");
+                        
+                        Button deleteBlogs = new Button("Delete");
+                        deleteBlogs.setTranslateX(619);
+                        deleteBlogs.setTranslateY(580);
+                        deleteBlogs.setStyle("-fx-background-color:CADETBLUE");
+                        deleteBlogs.setVisible(false);
+                        
+                        Button editBlogs = new Button("Edit");
+                        editBlogs.setTranslateX(680);
+                        editBlogs.setTranslateY(580);
+                        editBlogs.setStyle("-fx-background-color:CADETBLUE");
+                        editBlogs.setVisible(false);
                         
                         Button exitFromProfile = new Button("exit");
                         exitFromProfile.setTranslateX(1);
@@ -539,6 +574,78 @@ public class Bank extends Application {
                                 password.clear();
                             }
                         });
+                        
+                        list.setOnMouseClicked(new EventHandler<MouseEvent>(){
+                            @Override
+                            public void handle(MouseEvent event) {
+                                editBlogs.setVisible(true);
+                                deleteBlogs.setVisible(true);
+                                int selectedIdx = list.getSelectionModel().getSelectedIndex(); 
+                                String selectedItm = list.getSelectionModel().getSelectedItem().toString();
+                                String dateString = selectedItm.substring(selectedItm.lastIndexOf("\n") + 1);
+                                
+                                deleteBlogs.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                                        @Override
+                                        public void handle(MouseEvent event) {
+                                            list.getItems().remove(selectedIdx);
+                                            try {
+                                                connectToDB().executeUpdate("delete from posts where post_date='"+dateString+"'" );
+                                            } catch (SQLException ex) {
+                                                Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, ex);
+                                            }
+                                        }
+                                    });
+                            }
+                        });
+                        editBlogs.setOnMouseClicked(new EventHandler<MouseEvent>(){
+                            @Override
+                            public void handle(MouseEvent event) {
+                                apply.setVisible(true);
+                                cancel2.setVisible(true);
+                                String selectedItm = list.getSelectionModel().getSelectedItem().toString();
+                                String blogString = selectedItm.substring(0, selectedItm.lastIndexOf("\n"));
+                                blogtxt.setText(blogString);
+                                add.setDisable(true);
+                                
+                            }
+                        });
+                        apply.setOnAction(new EventHandler<ActionEvent>(){
+                            @Override
+                            public void handle(ActionEvent event) {
+                                apply.setVisible(false);
+                                cancel2.setVisible(false);
+                                String selectedItm = list.getSelectionModel().getSelectedItem().toString();
+                                String dateString = selectedItm.substring(selectedItm.lastIndexOf("\n") + 1);
+                                try {
+                                        connectToDB().executeUpdate("update posts set blog='"+blogtxt.getText()+"' where post_date='"+dateString+"'" );
+                                            } catch (SQLException ex) {
+                                                Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                arr.set(list.getSelectionModel().getSelectedIndex() , blogtxt.getText() +"\n"+dateString);
+                                list.setItems(arr);
+                                blogtxt.setText("");
+                                add.setDisable(false);
+                                
+                            }
+                        });
+                        cancel2.setOnAction(new EventHandler<ActionEvent>(){
+                            @Override
+                            public void handle(ActionEvent event) {
+                                apply.setVisible(false);
+                                cancel2.setVisible(false);
+                                blogtxt.setText("");
+                                add.setDisable(false);
+                            }
+                        });
+
+                        blogtxt.setOnMouseClicked(new EventHandler<MouseEvent>(){
+                            @Override
+                            public void handle(MouseEvent event) {
+                                deleteBlogs.setVisible(false);
+                                editBlogs.setVisible(false);
+                            }
+                        });
+                      
                         others.setOnMouseClicked(new EventHandler<MouseEvent>() {
                             @Override
                             public void handle(MouseEvent event) {
@@ -549,21 +656,21 @@ public class Bank extends Application {
                                 allStage.setResizable(false);
                                 allStage.show();
                                 
-                                Rectangle rec1 = new Rectangle(280, 520);//frame
-                                rec1.setTranslateX(85);
-                                rec1.setTranslateY(60);
-                                rec1.setFill(Color.TRANSPARENT);
-                                rec1.setStroke(Color.GREEN);
-                                rec1.setArcHeight(75);
-                                rec1.setArcWidth(75);
+                                Rectangle rec3 = new Rectangle(280, 520);//frame
+                                rec3.setTranslateX(85);
+                                rec3.setTranslateY(60);
+                                rec3.setFill(Color.TRANSPARENT);
+                                rec3.setStroke(Color.GREEN);
+                                rec3.setArcHeight(75);
+                                rec3.setArcWidth(75);
                                 
-                                Rectangle rec2 = new Rectangle(490, 520);//frame
-                                rec2.setTranslateX(375);
-                                rec2.setTranslateY(60);
-                                rec2.setFill(Color.TRANSPARENT);
-                                rec2.setStroke(Color.GREEN);
-                                rec2.setArcHeight(75);
-                                rec2.setArcWidth(75);
+                                Rectangle rec4 = new Rectangle(490, 520);//frame
+                                rec4.setTranslateX(375);
+                                rec4.setTranslateY(60);
+                                rec4.setFill(Color.TRANSPARENT);
+                                rec4.setStroke(Color.GREEN);
+                                rec4.setArcHeight(75);
+                                rec4.setArcWidth(75);
                         
                                 ListView<Pane> profileOfUsers = new ListView<>();
                                 profileOfUsers.setTranslateX(100);
@@ -664,7 +771,7 @@ public class Bank extends Application {
                                         try {
                                             posts = connectToDB().executeQuery("select blog, post_date from posts where user_log='" + loginForList + "' order by post_date DESC");
                                             while (posts.next()) {
-                                                postsOfUser.put(posts.getString(2), posts.getString(1));//key, value                                           
+                                                postsOfUser.put(posts.getString(2), posts.getString(1));//key - date, value - blog                                           
                                             }
                                             posts.close();
                                         } catch (SQLException ex) {
@@ -679,24 +786,24 @@ public class Bank extends Application {
                                 });
                                 
 
-                                allroot.getChildren().addAll(rec1,rec2,profileOfUsers,blogOfUser, text1,text2,back);
+                                allroot.getChildren().addAll(rec3,rec4,profileOfUsers,blogOfUser, text1,text2,back);
                                 allStage.setTitle("All profiles");       
                             }   
                         });
                         profroot.getChildren().addAll(ntext, ntext2, stext, stext2,
                                 phtext, phtext2, datetext, datetext2, postext, postext2, saltext, saltext2,
-                                pf1, pf2, pf3, pf4, pf5, pf6, rec, myblog, blogtxt, add, accept, cancel, list, others,
-                                edit1, edit2, edit3, edit4, edit5, edit6,exitFromProfile);
+                                pf1, pf2, pf3, pf4, pf5, pf6, rec1,rec2, apply,cancel2,myblog, blogtxt, add, accept, cancel, list, others,
+                                deleteBlogs,editBlogs,edit1, edit2, edit3, edit4, edit5, edit6,exitFromProfile);
                         profStage.setTitle("My profile");
                         Button changeImage = new Button();//Image
                         changeImage.setTranslateX(235);
                         changeImage.setTranslateY(175);
                         FileChooser fc = new FileChooser();
                         try {
-                            Image imageCam = new Image(new FileInputStream("/Users/macbookair/Desktop/camera.png"));
+                            Image imageCam = new Image(new FileInputStream("/Users/macbookair/NetBeansProjects/Bank/camera.png"));
                             ImageView imgvv = new ImageView(imageCam);
-                            imgvv.setFitWidth(15);
-                            imgvv.setFitHeight(15);
+                            imgvv.setFitWidth(14);
+                            imgvv.setFitHeight(16);
                             changeImage.setGraphic(imgvv);
                                     } catch (FileNotFoundException ex) {
                             Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, ex);
@@ -729,6 +836,7 @@ public class Bank extends Application {
                         changeImage.setOnAction(new EventHandler<ActionEvent>(){
                             @Override
                             public void handle(ActionEvent event) {
+                                System.out.println("Testttt");
                                 fileImage = fc.showOpenDialog(profStage);
                                 if(fileImage != null){
                                     FileInputStream stream = null;
@@ -744,21 +852,30 @@ public class Bank extends Application {
 
                                         ps.setBinaryStream(1, (InputStream) stream, (int) fileImage.length());
                                         ps.executeUpdate();
+                                        
+                                        ResultSet rs = connectToDB().executeQuery("select name,image from users where login='" + lg + "';");
+                                        InputStream ref3 =null;
+                                        while(rs.next()){
+                                            ref3 = rs.getBinaryStream("image");
+                                            System.out.println(rs.getString("name"));
+                                        }
+                                        System.out.println(ref3.toString());
+                                       
+                                        Image im = new Image(ref3);
+                                        circle.setFill(new ImagePattern(im));
                                         ps.close();
+                                        
                                     
                                     } catch (SQLException ex) {
                                         Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, ex);
                                     }
                                     
-                                    try{
-                                       ResultSet rs = connectToDB().executeQuery("select image from users where login='" + lg + "';");
-                                       ref2 = rs.getBinaryStream("image");
-                                       Image im = new Image(ref2);
-                                       circle.setFill(new ImagePattern(im));
-                                    }
-                                    catch(SQLException ex){
-                                        
-                                    }
+//                                    try{
+                                       
+//                                    }
+//                                    catch(SQLException ex){
+//                                        
+//                                    }
                                     
                                 }
                             }
@@ -852,10 +969,10 @@ public class Bank extends Application {
                 saveImage.setTranslateY(402);
                 FileChooser fc = new FileChooser();
                 try {
-                    Image imageCam = new Image(new FileInputStream("/Users/macbookair/Desktop/camera.png"));
+                    Image imageCam = new Image(new FileInputStream("/Users/macbookair/NetBeansProjects/Bank/camera.png"));
                     ImageView imgvv = new ImageView(imageCam);
-                    imgvv.setFitWidth(15);
-                    imgvv.setFitHeight(15);
+                    imgvv.setFitWidth(14);
+                    imgvv.setFitHeight(16);
                     saveImage.setGraphic(imgvv);
                             } catch (FileNotFoundException ex) {
                     Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, ex);
@@ -889,18 +1006,6 @@ public class Bank extends Application {
                 exitFromReg.setTranslateX(1);
                 exitFromReg.setTranslateY(1);
                 exitFromReg.setStyle("-fx-background-color:CADETBLUE");
-                
-//                pass.setOnMouseMoved(new EventHandler<MouseEvent>(){
-//                    @Override
-//                    public void handle(MouseEvent event) {
-//                        if(pass.getText().length()<8){
-//                            error4.setVisible(true);
-//                        }
-//                        else{
-//                            error4.setVisible(false);
-//                        }
-//                    }
-//                });
 
                 exitFromReg.setOnMouseClicked(new EventHandler<MouseEvent>(){
                     @Override
